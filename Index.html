@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>StrokeCare Elite - RSPAD Gatot Soebroto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        :root { --emerald: #10b981; --rspad-navy: #0f172a; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; min-height: 100vh;
+            background-color: var(--rspad-navy);
+            background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.85) 50%, rgba(15, 23, 42, 0.98) 100%), 
+            url('https://rspadgs.mil.id/thumbs/680x420c/2025-12/gedung-buat-plakat.jpg'); 
+            background-size: cover; background-position: center; background-attachment: fixed;
+            color: #f8fafc; overflow-x: hidden;
+        }
+        .glass-panel { background: rgba(30, 41, 59, 0.65); backdrop-filter: blur(25px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); }
+        .logo-glow { filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.6)); animation: pulse-logo 3s infinite ease-in-out; }
+        @keyframes pulse-logo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .premium-input { background: rgba(15, 23, 42, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.1); width: 100%; padding: 15px 20px; border-radius: 20px; outline: none; color: white; transition: all 0.3s; font-size: 14px; }
+        .premium-input:focus { border-color: var(--emerald); background: rgba(15, 23, 42, 0.9); box-shadow: 0 0 15px rgba(16, 185, 129, 0.1); }
+        .nav-pill { opacity: 0.4; transition: 0.4s; position: relative; }
+        .nav-pill.active { opacity: 1; color: var(--emerald); font-weight: 800; }
+        .nav-pill.active::after { content: ''; position: absolute; bottom: -8px; left: 25%; width: 50%; height: 4px; background: var(--emerald); border-radius: 10px; box-shadow: 0 0 15px var(--emerald); }
+        .btn-main { background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 22px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 12px 24px -6px rgba(16, 185, 129, 0.5); }
+        .btn-main:active { transform: scale(0.95); opacity: 0.9; }
+        .btn-template { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 700; color: #10b981; transition: 0.3s; }
+        .btn-template:hover { background: rgba(16, 185, 129, 0.2); border-color: var(--emerald); }
+        .modal-overlay { background: rgba(2, 6, 23, 0.97); backdrop-filter: blur(20px); display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.active { display: flex; animation: slideUpModal 0.3s forwards; }
+        @keyframes slideUpModal { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="p-5 pb-28">
+
+    <div class="flex flex-col items-center pt-8 pb-12 text-center">
+        <img src="https://stikesrspadgs.ac.id/v2/wp-content/uploads/2025/11/LOGO-RSPAD-2-874x1024.png" class="h-20 logo-glow mb-6">
+        <h1 class="text-2xl font-extrabold tracking-tight">StrokeCare <span class="text-emerald-500 italic">Elite</span></h1>
+        <div class="mt-3 bg-slate-900/80 border border-emerald-500/20 px-6 py-2 rounded-full inline-flex items-center gap-3">
+            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+            <p class="text-[10px] font-black tracking-[0.4em] text-emerald-400 uppercase">Bersyukur - RSPAD</p>
+        </div>
+    </div>
+
+    <div class="flex bg-slate-900/60 backdrop-blur-2xl rounded-[28px] p-2 mb-10 border border-white/5 sticky top-4 z-40 shadow-2xl">
+        <button id="p-data" onclick="setTab('data')" class="nav-pill active flex-1 py-4 text-[10px] uppercase tracking-[0.2em]">SBAR & SOAP</button>
+        <button id="p-calc" onclick="setTab('calc')" class="nav-pill flex-1 py-4 text-[10px] uppercase tracking-[0.2em]">Kalkulator</button>
+    </div>
+
+    <div id="sec-data" class="space-y-6">
+        <div class="glass-panel p-8 space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Registrasi Pasien</h2>
+                <button onclick="clearForm()" class="text-[9px] font-bold text-red-400/80 uppercase hover:text-red-400"><i class="fas fa-trash-alt mr-1"></i> Reset</button>
+            </div>
+            <div class="relative group">
+                <input type="text" id="rm" placeholder="Cari No. RM..." class="premium-input font-black tracking-widest pr-24">
+                <button onclick="getData()" class="absolute right-2 top-2 bottom-2 bg-emerald-600/20 text-emerald-400 border border-emerald-500/20 px-5 rounded-xl text-[10px] font-black">CARI</button>
+            </div>
+            <input type="text" id="nama" placeholder="Nama Lengkap Pasien" class="premium-input font-bold">
+            <div class="grid grid-cols-2 gap-4">
+                <input type="number" id="usia" placeholder="Usia" class="premium-input">
+                <input type="number" id="bb" placeholder="BB (Kg)" class="premium-input">
+            </div>
+        </div>
+
+        <div class="glass-panel p-8 space-y-6">
+            <div class="flex justify-between items-center border-b border-white/5 pb-4">
+                <h2 class="text-[10px] font-bold text-slate-300 uppercase tracking-widest italic">Dokumentasi SOAP</h2>
+                <button onclick="showModal(true)" class="btn-main px-4 py-2 text-[9px] font-black uppercase"><i class="fas fa-brain mr-1"></i> GCS</button>
+            </div>
+
+            <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-tighter">S: Subjective</span>
+                    <button onclick="addTemplate('s', 'RPS (Riwayat Penyakit Sekarang):\n- Keluhan Utama: \n- Onset/Waktu Kejadian: \n- Kronologi: ')" class="btn-template">+ RPS</button>
+                    <button onclick="addTemplate('s', 'RPO (Riwayat Penggunaan Obat):\n1. \n2. \n3. ')" class="btn-template">+ RPO</button>
+                </div>
+                <textarea id="s" placeholder="Input keluhan atau pilih template..." class="premium-input h-28 text-xs italic"></textarea>
+            </div>
+
+            <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-tighter">O: Objective</span>
+                    <button onclick="addTemplate('o', 'TTV:\n- TD:  / mmHg\n- N:  x/mnt\n- RR:  x/mnt\n- S:  °C\n- SpO2:  %')" class="btn-template">+ TTV</button>
+                    <button onclick="addTemplate('o', 'PENGKAJIAN NEUROLOGI:\n- Pupil: ( / ) mm\n- Refleks Cahaya: ( / )\n- Kekuatan Otot: (5555/5555)\n- Bicara: (Pelo/Biasa)')" class="btn-template">+ NEUROLOGI</button>
+                </div>
+                <textarea id="o" placeholder="Hasil pemeriksaan fisik..." class="premium-input h-36 text-xs"></textarea>
+            </div>
+
+            <textarea id="a" placeholder="A: Assessment (Diagnosis)" class="premium-input h-16 text-xs"></textarea>
+            <textarea id="p" placeholder="P: Planning (Rencana Tindakan)" class="premium-input h-16 text-xs"></textarea>
+        </div>
+
+        <button onclick="sendSBAR()" class="btn-main w-full p-5 font-black text-[14px] tracking-widest flex justify-center items-center gap-4 shadow-xl shadow-emerald-900/40">
+            <i class="fab fa-whatsapp text-2xl"></i> KIRIM LAPORAN SBAR
+        </button>
+    </div>
+
+    <div id="sec-calc" class="hidden space-y-6">
+        <div class="glass-panel p-8 space-y-6">
+            <div class="text-center mb-4">
+                <h2 class="text-xs font-black text-emerald-400 uppercase tracking-[0.4em]">Titrasi Emergency</h2>
+                <div class="h-1 w-12 bg-emerald-500 mx-auto mt-2 rounded-full shadow-lg shadow-emerald-500/50"></div>
+            </div>
+            <div class="space-y-5">
+                <select id="med" onchange="autoMed()" class="premium-input font-bold text-emerald-400">
+                    <option value="">-- Pilih Obat --</option>
+                    <option value="nicar10">Nicardipine 10mg / 50ml</option>
+                    <option value="nicar50">Nicardipine 50mg / 50ml</option>
+                    <option value="ne4">NE 4mg / 50ml</option>
+                    <option value="ne8">NE 8mg / 50ml</option>
+                    <option value="dopa">Dopamine 200mg / 50ml</option>
+                </select>
+                <div class="relative">
+                    <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-2 block">Dosis Target</label>
+                    <input type="number" id="target" placeholder="0.00" class="premium-input text-5xl font-black py-8">
+                    <span id="unit_label" class="absolute right-5 bottom-5 text-[10px] font-black text-emerald-500 uppercase italic">Unit</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" id="mg_val" placeholder="Mg" class="premium-input">
+                    <input type="number" id="ml_val" placeholder="Ml" class="premium-input">
+                </div>
+                <div class="flex gap-2 p-1.5 bg-slate-950/80 rounded-[20px] border border-white/5 shadow-inner">
+                    <button id="u-mcg" onclick="switchUnit('mcg')" class="flex-1 py-3.5 text-[9px] font-black rounded-xl bg-emerald-600 transition-all">MCG/KG/MNT</button>
+                    <button id="u-mg" onclick="switchUnit('mg')" class="flex-1 py-3.5 text-[9px] font-black rounded-xl opacity-30 transition-all">MG/JAM</button>
+                </div>
+                <button onclick="doCalc()" class="btn-main w-full p-5 font-black text-[12px] uppercase tracking-[0.2em] shadow-xl shadow-emerald-900/30">HITUNG ML/JAM</button>
+            </div>
+            <div id="res_box" class="hidden p-8 bg-emerald-950/30 border border-emerald-500/30 rounded-[40px] text-center mt-6">
+                <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2">Kecepatan Pompa</p>
+                <div class="flex items-baseline justify-center gap-3">
+                    <span id="res_val" class="text-7xl font-black text-white">0</span>
+                    <span class="text-xl font-bold text-emerald-500 italic">ml/j</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalGCS" class="modal-overlay">
+        <div class="bg-slate-900/90 backdrop-blur-3xl border border-white/10 p-8 rounded-[40px] w-full max-w-[380px]">
+            <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
+                <h3 class="text-emerald-400 font-black text-xs uppercase tracking-widest">Pengkajian GCS</h3>
+                <button onclick="showModal(false)" class="text-slate-500 text-3xl">&times;</button>
+            </div>
+            <div class="space-y-5">
+                <select id="e" onchange="runGCS()" class="premium-input text-xs"><option value="4">4 - Mata Spontan</option><option value="3">3 - Mata Suara</option><option value="2">2 - Mata Nyeri</option><option value="1">1 - Mata Nihil</option></select>
+                <select id="v" onchange="runGCS()" class="premium-input text-xs"><option value="5">5 - Bicara Orientasi</option><option value="4">4 - Bicara Bingung</option><option value="3">3 - Bicara Tak Tepat</option><option value="2">2 - Bicara Mengerang</option><option value="1">1 - Bicara Nihil</option></select>
+                <select id="m" onchange="runGCS()" class="premium-input text-xs"><option value="6">6 - Gerak Patuh</option><option value="5">5 - Gerak Lokalisir</option><option value="4">4 - Gerak Menarik</option><option value="3">3 - Gerak Fleksi</option><option value="2">2 - Gerak Ekstensi</option><option value="1">1 - Gerak Nihil</option></select>
+            </div>
+            <div class="my-8 bg-slate-950 p-6 rounded-[30px] text-center border border-emerald-500/10">
+                <span id="g_total" class="text-6xl font-black text-emerald-400">15</span>
+                <p id="g_interp" class="text-[10px] font-bold text-white uppercase mt-2 tracking-widest">Compos Mentis</p>
+            </div>
+            <button onclick="insertGCS()" class="btn-main w-full p-5 font-black text-[11px] uppercase tracking-widest">MASUKKAN KE FORM</button>
+        </div>
+    </div>
+
+    <div id="loader" class="hidden fixed inset-0 bg-[#020617] backdrop-blur-3xl flex flex-col items-center justify-center z-[300]">
+        <img src="https://stikesrspadgs.ac.id/v2/wp-content/uploads/2025/11/LOGO-RSPAD-2-874x1024.png" class="h-24 logo-glow animate-pulse mb-8">
+        <p class="text-[11px] font-black text-emerald-500 tracking-[0.8em] animate-pulse uppercase">PROCESSING DATA</p>
+    </div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxksR9Qr9PRS2-yjDC9N1BSf9bbPx1lJHV7d6jY9qc4NfDQGV0xrs_yaoJe4U1-JHFy/exec';
+        let unit = 'mcg';
+
+        const medDB = {
+            nicar10: { mg: 10, ml: 50, u: 'mg' },
+            nicar50: { mg: 50, ml: 50, u: 'mg' },
+            ne4: { mg: 4, ml: 50, u: 'mcg' },
+            ne8: { mg: 8, ml: 50, u: 'mcg' },
+            dopa: { mg: 200, ml: 50, u: 'mcg' }
+        };
+
+        function setTab(t) {
+            document.getElementById('sec-data').classList.toggle('hidden', t !== 'data');
+            document.getElementById('sec-calc').classList.toggle('hidden', t !== 'calc');
+            document.getElementById('p-data').classList.toggle('active', t === 'data');
+            document.getElementById('p-calc').classList.toggle('active', t === 'calc');
+        }
+
+        function showModal(s) { document.getElementById('modalGCS').classList.toggle('active', s); }
+
+        function addTemplate(id, template) {
+            const area = document.getElementById(id);
+            if(area.value) {
+                area.value += "\n\n" + template;
+            } else {
+                area.value = template;
+            }
+            area.focus();
+        }
+
+        function switchUnit(u) {
+            unit = u;
+            document.getElementById('u-mcg').classList.toggle('opacity-30', u !== 'mcg');
+            document.getElementById('u-mcg').classList.toggle('bg-emerald-600', u === 'mcg');
+            document.getElementById('u-mg').classList.toggle('opacity-30', u !== 'mg');
+            document.getElementById('u-mg').classList.toggle('bg-emerald-600', u === 'mg');
+            document.getElementById('unit_label').innerText = u === 'mcg' ? 'MCG/KG/MNT' : 'MG/JAM';
+        }
+
+        function autoMed() {
+            const m = medDB[document.getElementById('med').value];
+            if(m) {
+                document.getElementById('mg_val').value = m.mg;
+                document.getElementById('ml_val').value = m.ml;
+                switchUnit(m.u);
+            }
+        }
+
+        function doCalc() {
+            const d = parseFloat(document.getElementById('target').value), mg = parseFloat(document.getElementById('mg_val').value), ml = parseFloat(document.getElementById('ml_val').value), bb = parseFloat(document.getElementById('bb').value);
+            if(!d || !mg || !ml) return alert("Lengkapi data!");
+            let s = 0;
+            if(unit === 'mcg') {
+                if(!bb) return alert("Isi Berat Badan Pasien di Form Atas!");
+                s = (d * bb * 60) / ((mg * 1000) / ml);
+            } else {
+                s = d / (mg / ml);
+            }
+            document.getElementById('res_val').innerText = s.toFixed(1);
+            document.getElementById('res_box').classList.remove('hidden');
+        }
+
+        function runGCS() {
+            const e = parseInt(document.getElementById('e').value), v = parseInt(document.getElementById('v').value), m = parseInt(document.getElementById('m').value), t = e+v+m;
+            document.getElementById('g_total').innerText = t;
+            document.getElementById('g_interp').innerText = t >= 14 ? "Compos Mentis" : t >= 12 ? "Apatis" : t >= 10 ? "Delirium" : t >= 7 ? "Somnolen" : t >= 5 ? "Sopor" : "Coma";
+        }
+
+        function insertGCS() {
+            const res = `GCS: ${document.getElementById('g_total').innerText} (E${document.getElementById('e').value}V${document.getElementById('v').value}M${document.getElementById('m').value}) - ${document.getElementById('g_interp').innerText}`;
+            document.getElementById('o').value += (document.getElementById('o').value ? "\n" : "") + res;
+            showModal(false);
+        }
+
+        function clearForm() { if(confirm("Hapus seluruh data form?")) { document.querySelectorAll('input, textarea, select').forEach(i => i.value = ''); document.getElementById('res_box').classList.add('hidden'); } }
+
+        function toggleLoad(s) { document.getElementById('loader').classList.toggle('hidden', !s); }
+
+        async function getData() {
+            const rmVal = document.getElementById('rm').value; if(!rmVal) return;
+            toggleLoad(true);
+            try {
+                const res = await fetch(GOOGLE_SCRIPT_URL);
+                const db = await res.json();
+                const p = db.find(x => x[4].toString() === rmVal);
+                if(p) {
+                    document.getElementById('nama').value = p[3]; document.getElementById('usia').value = p[5]; document.getElementById('bb').value = p[6];
+                    document.getElementById('s').value = p[8]; document.getElementById('o').value = p[9];
+                    document.getElementById('a').value = p[10]; document.getElementById('p').value = p[11];
+                } else alert("Pasien tidak ditemukan.");
+            } catch(e) { alert("Sinkronisasi database gagal."); }
+            toggleLoad(false);
+        }
+
+        function sendSBAR() {
+            const dataSBAR = {
+                nama: document.getElementById('nama').value,
+                rm: document.getElementById('rm').value,
+                s: document.getElementById('s').value || "-",
+                o: document.getElementById('o').value || "-",
+                a: document.getElementById('a').value || "-",
+                p: document.getElementById('p').value || "-"
+            };
+
+            if(!dataSBAR.nama) { alert("Nama Pasien wajib diisi!"); return; }
+
+            const teksWA = `*🚨 LAPORAN SBAR - UNIT STROKE RSPAD*\n` +
+                           `------------------------------------------\n` +
+                           `*Nama:* ${dataSBAR.nama}\n` +
+                           `*RM:* ${dataSBAR.rm}\n\n` +
+                           `*S (Subjective):*\n${dataSBAR.s}\n\n` +
+                           `*O (Objective):*\n${dataSBAR.o}\n\n` +
+                           `*A (Assessment):*\n${dataSBAR.a}\n\n` +
+                           `*P (Planning):*\n${dataSBAR.p}\n` +
+                           `------------------------------------------\n` +
+                           `_Dikirim via StrokeCare Elite_`;
+
+            toggleLoad(true);
+            const encodedMsg = encodeURIComponent(teksWA);
+            setTimeout(() => {
+                toggleLoad(false);
+                window.location.href = `https://api.whatsapp.com/send?text=${encodedMsg}`;
+            }, 800);
+        }
+    </script>
+</body>
+</html>
